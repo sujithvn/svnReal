@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-
+from django.core.mail import send_mail
 from .models import Contact
 
 
@@ -16,7 +16,7 @@ def contact(request):
         realtor_email = request.POST['realtor_email']
 
         if request.user.is_authenticated:
-            user_id = request.user_id
+            user_id = request.user.id
             has_contacted = Contact.objects.all().filter(
                 listing_id=listing_id, user_id=user_id)
             if has_contacted:
@@ -28,6 +28,15 @@ def contact(request):
                           phone=phone, message=message, user_id=user_id)
 
         contact.save()
+
+        # Sending email
+        # send_mail(
+        #     'Property listing inquiry on SVN Real Estate',
+        #     'New inquiry alert, sign in to see details',
+        #     'contact@svnre.com',
+        #     [realtor_email, 'contact@svnre.com'],
+        #     fail_silently=False
+        # )
 
         messages.success(
             request, 'Your inquiry has been posted, the realtor will get back to you asap')
